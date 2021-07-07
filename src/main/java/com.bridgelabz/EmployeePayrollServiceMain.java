@@ -17,6 +17,7 @@ import com.bridgelabz.service.EmployeePayrollDBService;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 public class EmployeePayrollServiceMain {
 
@@ -103,5 +104,13 @@ public class EmployeePayrollServiceMain {
      */
     public List<EmployeePayrollData> readEmployeePayrollForDate(LocalDate startDate, LocalDate endDate) throws EmployeePayrollException {
         return  employeePayrollDBService.getEmployeePayrollForDateRange(startDate,endDate);
+    }
+
+    /**
+     * UC6 - Method for getting average salary by gender from database.
+     * @return
+     */
+    public Map<String, Double> readAverageSalaryByGender() throws EmployeePayrollException {
+        return employeePayrollDBService.getAverageSalaryByGender();
     }
 }

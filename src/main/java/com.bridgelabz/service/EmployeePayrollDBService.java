@@ -16,7 +16,9 @@ import com.bridgelabz.model.EmployeePayrollData;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class EmployeePayrollDBService {
     private PreparedStatement employeePayrollDataStatement;
@@ -118,6 +120,28 @@ public class EmployeePayrollDBService {
     public List<EmployeePayrollData> getEmployeePayrollForDateRange(LocalDate startDate, LocalDate endDate) throws EmployeePayrollException {
         String query = String.format("SELECT * FROM employee_payroll WHERE start_date BETWEEN '%s' AND '%s';",Date.valueOf(startDate), Date.valueOf(endDate));
         return this.getEmployeePayrollDataUsingDB(query);
+    }
+
+    /**
+     * UC6 - Method for getting average salary by gender from database
+     * @return : map of gender and avg salary.
+     */
+    public Map<String, Double> getAverageSalaryByGender() throws EmployeePayrollException {
+        String query = "SELECT gender, AVG(salary) as avg_salary FROM employee_payroll GROUP BY gender;";
+        Map<String,Double> genderToAverageSalaryMap = new HashMap<>();
+        try(Connection connection = this.getConnection();) {
+            Statement statement = connection.createStatement();
+            ResultSet result = statement.executeQuery(query);
+            while (result.next()){
+                String gender = result.getString("gender");
+                double salary = result.getDouble("avg_salary");
+                genderToAverageSalaryMap.put(gender,salary);
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
+        return genderToAverageSalaryMap;
     }
 
     /**

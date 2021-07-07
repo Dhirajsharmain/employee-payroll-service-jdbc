@@ -8,6 +8,7 @@ import org.junit.Test;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 public class EmployeePayrollServiceTest {
 
@@ -40,5 +41,12 @@ public class EmployeePayrollServiceTest {
         LocalDate endDate = LocalDate.now();
         List<EmployeePayrollData> employeePayrollData = employeePayrollServiceMain.readEmployeePayrollForDate(startDate, endDate);
         Assert.assertEquals(4,employeePayrollData.size());
+    }
+
+    @Test
+    public void givenPayrollData_whenAverageSalaryRetrievedByGender_shouldReturnProperValue() throws EmployeePayrollException {
+        employeePayrollServiceMain.retrievingEmployeeData();
+        Map<String,Double> averageSalaryByGender = employeePayrollServiceMain.readAverageSalaryByGender();
+        Assert.assertTrue(averageSalaryByGender.get("M").equals(50000.00) && averageSalaryByGender.get("F").equals(300000.00));
     }
 }
