@@ -215,12 +215,12 @@ public class EmployeePayrollDBService {
     }
 
     /**
-     * UC7
+     * UC7 - Method for add new employee to the database.
      *
-     * @param name
-     * @param salary
-     * @param startDate
-     * @param gender
+     * @param name : new employee name
+     * @param salary : new employee salary
+     * @param startDate : new employee starting date
+     * @param gender : new employee gender
      * @return
      */
     public EmployeePayrollData addEmployeeToPayroll(String name, double salary, LocalDate startDate, String gender) throws EmployeePayrollException {
