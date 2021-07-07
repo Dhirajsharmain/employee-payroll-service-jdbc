@@ -33,7 +33,7 @@ public class EmployeePayrollDBService {
     }
 
     /**
-     * Method for create connection to the database.
+     * UC1 - Method for create connection to the database.
      *
      * @return : Connection
      * @throws EmployeePayrollException
@@ -56,7 +56,7 @@ public class EmployeePayrollDBService {
     }
 
     /**
-     * Method for retrieving data from database.
+     * UC2 - Method for retrieving data from database.
      * @return : list of EmployeePayrollData
      * @throws EmployeePayrollException
      */
@@ -77,6 +77,11 @@ public class EmployeePayrollDBService {
 
     }
 
+    /**
+     * UC4 - Method for prepared statement
+     * @param name
+     * @return
+     */
     public List<EmployeePayrollData> getEmployeeData(String name) {
         List<EmployeePayrollData> employeePayrollList = null;
         if (this.employeePayrollDataStatement == null)
@@ -91,6 +96,11 @@ public class EmployeePayrollDBService {
         return employeePayrollList;
     }
 
+    /**
+     * UC3 - Method for retrieving data from database. Method to process the resultSet.
+     * @param resultSet
+     * @return
+     */
     private List<EmployeePayrollData> getEmployeePayrollData(ResultSet resultSet) {
         List<EmployeePayrollData> employeePayrollList = new ArrayList<>();
         EmployeePayrollData emData = new EmployeePayrollData();
@@ -109,6 +119,9 @@ public class EmployeePayrollDBService {
         return employeePayrollList;
     }
 
+    /**
+     * UC4 - object for preparedStatement
+     */
     private void preparedStatementForEmployeeData() {
        try {
            Connection connection = this.getConnection();
@@ -119,10 +132,25 @@ public class EmployeePayrollDBService {
        }
     }
 
+    /**
+     * UC3 - Method for updating the employee data using Statement
+     * @param name : employee name
+     * @param salary : employee new salary
+     * @return
+     * @throws EmployeePayrollException
+     * @throws SQLException
+     */
     public int updateData(String name, double salary) throws EmployeePayrollException, SQLException {
         return this.updateEmployeeDataUsingStatement(name,salary);
     }
 
+    /**
+     * UC3 - Helper method for updating the employee data using Statement
+     * @param name : employee name
+     * @param salary : employee new salary
+     * @return
+     * @throws EmployeePayrollException
+     */
     private int updateEmployeeDataUsingStatement(String name, double salary) throws EmployeePayrollException {
         String query = String.format("update employee_payroll set salary = %.2f where name = '%s';",salary,name);
         try(Connection connection = this.getConnection()){
