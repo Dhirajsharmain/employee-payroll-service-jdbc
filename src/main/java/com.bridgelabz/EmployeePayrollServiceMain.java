@@ -15,6 +15,7 @@ import com.bridgelabz.model.EmployeePayrollData;
 import com.bridgelabz.service.EmployeePayrollDBService;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.List;
 
 public class EmployeePayrollServiceMain {
@@ -91,5 +92,16 @@ public class EmployeePayrollServiceMain {
     public boolean checkEmployeePayrollInSyncWithDB(String name) {
         List<EmployeePayrollData> employeePayrollDataList = employeePayrollDBService.getEmployeeData(name);
         return employeePayrollDataList.get(0).equals(getEmployeePayrollData(name));
+    }
+
+    /**
+     * UC5 -  Method for read data from database in give data range
+     * @param startDate : start date
+     * @param endDate : end date
+     * @return : total employee object
+     * @throws EmployeePayrollException
+     */
+    public List<EmployeePayrollData> readEmployeePayrollForDate(LocalDate startDate, LocalDate endDate) throws EmployeePayrollException {
+        return  employeePayrollDBService.getEmployeePayrollForDateRange(startDate,endDate);
     }
 }

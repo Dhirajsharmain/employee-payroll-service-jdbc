@@ -14,6 +14,7 @@ import com.bridgelabz.exception.EmployeePayrollException;
 import com.bridgelabz.model.EmployeePayrollData;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,19 +62,8 @@ public class EmployeePayrollDBService {
      * @throws EmployeePayrollException
      */
     public List<EmployeePayrollData> readData() throws EmployeePayrollException {
-
         String query = "SELECT * FROM employee_payroll; ";
-        List<EmployeePayrollData> employeePayrollList = new ArrayList<>();
-
-        try(Connection connection = this.getConnection();) {
-            EmployeePayrollData emData = new EmployeePayrollData();
-            Statement statement =  connection.createStatement();
-            ResultSet result = statement.executeQuery(query);
-            employeePayrollList = this.getEmployeePayrollData(result);
-        } catch (SQLException e) {
-            throw new EmployeePayrollException(e.getMessage());
-        }
-        return employeePayrollList;
+        return this.getEmployeePayrollDataUsingDB(query);
 
     }
 
@@ -115,6 +105,37 @@ public class EmployeePayrollDBService {
             }
         } catch (SQLException throwables) {
             throwables.printStackTrace();
+        }
+        return employeePayrollList;
+    }
+
+    /**
+     * UC5 - Method for retrieving data from database for a given date range.
+     * @param startDate
+     * @param endDate
+     * @return
+     */
+    public List<EmployeePayrollData> getEmployeePayrollForDateRange(LocalDate startDate, LocalDate endDate) throws EmployeePayrollException {
+        String query = String.format("SELECT * FROM employee_payroll WHERE start_date BETWEEN '%s' AND '%s';",Date.valueOf(startDate), Date.valueOf(endDate));
+        return this.getEmployeePayrollDataUsingDB(query);
+    }
+
+    /**
+     * Helper or Generic method for retrieving data from database.
+     * @param query
+     * @return
+     * @throws EmployeePayrollException
+     */
+    private List<EmployeePayrollData> getEmployeePayrollDataUsingDB(String query) throws EmployeePayrollException {
+        List<EmployeePayrollData> employeePayrollList = new ArrayList<>();
+
+        try(Connection connection = this.getConnection();) {
+            EmployeePayrollData emData = new EmployeePayrollData();
+            Statement statement =  connection.createStatement();
+            ResultSet result = statement.executeQuery(query);
+            employeePayrollList = this.getEmployeePayrollData(result);
+        } catch (SQLException e) {
+            throw new EmployeePayrollException(e.getMessage());
         }
         return employeePayrollList;
     }
