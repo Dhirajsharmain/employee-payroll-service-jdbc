@@ -113,4 +113,15 @@ public class EmployeePayrollServiceMain {
     public Map<String, Double> readAverageSalaryByGender() throws EmployeePayrollException {
         return employeePayrollDBService.getAverageSalaryByGender();
     }
+
+    /**
+     * UC7-
+     * @param name
+     * @param salary
+     * @param startDate
+     * @param gender
+     */
+    public void addEmployeeToPayroll(String name, double salary, LocalDate startDate, String gender) throws EmployeePayrollException {
+        employeePayrollList.add(employeePayrollDBService.addEmployeeToPayroll(name,salary,startDate,gender));
+    }
 }

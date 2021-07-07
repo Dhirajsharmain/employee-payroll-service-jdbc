@@ -60,6 +60,7 @@ public class EmployeePayrollDBService {
 
     /**
      * UC2 - Method for retrieving data from database.
+     *
      * @return : list of EmployeePayrollData
      * @throws EmployeePayrollException
      */
@@ -71,6 +72,7 @@ public class EmployeePayrollDBService {
 
     /**
      * UC4 - Method for prepared statement
+     *
      * @param name
      * @return
      */
@@ -79,7 +81,7 @@ public class EmployeePayrollDBService {
         if (this.employeePayrollDataStatement == null)
             this.preparedStatementForEmployeeData();
         try {
-            employeePayrollDataStatement.setString(1,name);
+            employeePayrollDataStatement.setString(1, name);
             ResultSet resultSet = employeePayrollDataStatement.executeQuery();
             employeePayrollList = this.getEmployeePayrollData(resultSet);
         } catch (SQLException throwables) {
@@ -90,6 +92,7 @@ public class EmployeePayrollDBService {
 
     /**
      * UC3 - Method for retrieving data from database. Method to process the resultSet.
+     *
      * @param resultSet
      * @return
      */
@@ -97,7 +100,7 @@ public class EmployeePayrollDBService {
         List<EmployeePayrollData> employeePayrollList = new ArrayList<>();
         EmployeePayrollData emData = new EmployeePayrollData();
         try {
-            while (resultSet.next()){
+            while (resultSet.next()) {
                 emData.setId(resultSet.getInt("id"));
                 emData.setName(resultSet.getString("name"));
                 emData.setGender(resultSet.getString("gender"));
@@ -113,29 +116,31 @@ public class EmployeePayrollDBService {
 
     /**
      * UC5 - Method for retrieving data from database for a given date range.
+     *
      * @param startDate
      * @param endDate
      * @return
      */
     public List<EmployeePayrollData> getEmployeePayrollForDateRange(LocalDate startDate, LocalDate endDate) throws EmployeePayrollException {
-        String query = String.format("SELECT * FROM employee_payroll WHERE start_date BETWEEN '%s' AND '%s';",Date.valueOf(startDate), Date.valueOf(endDate));
+        String query = String.format("SELECT * FROM employee_payroll WHERE start_date BETWEEN '%s' AND '%s';", Date.valueOf(startDate), Date.valueOf(endDate));
         return this.getEmployeePayrollDataUsingDB(query);
     }
 
     /**
      * UC6 - Method for getting average salary by gender from database
+     *
      * @return : map of gender and avg salary.
      */
     public Map<String, Double> getAverageSalaryByGender() throws EmployeePayrollException {
         String query = "SELECT gender, AVG(salary) as avg_salary FROM employee_payroll GROUP BY gender;";
-        Map<String,Double> genderToAverageSalaryMap = new HashMap<>();
-        try(Connection connection = this.getConnection();) {
+        Map<String, Double> genderToAverageSalaryMap = new HashMap<>();
+        try (Connection connection = this.getConnection();) {
             Statement statement = connection.createStatement();
             ResultSet result = statement.executeQuery(query);
-            while (result.next()){
+            while (result.next()) {
                 String gender = result.getString("gender");
                 double salary = result.getDouble("avg_salary");
-                genderToAverageSalaryMap.put(gender,salary);
+                genderToAverageSalaryMap.put(gender, salary);
             }
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -146,6 +151,7 @@ public class EmployeePayrollDBService {
 
     /**
      * Helper or Generic method for retrieving data from database.
+     *
      * @param query
      * @return
      * @throws EmployeePayrollException
@@ -153,9 +159,9 @@ public class EmployeePayrollDBService {
     private List<EmployeePayrollData> getEmployeePayrollDataUsingDB(String query) throws EmployeePayrollException {
         List<EmployeePayrollData> employeePayrollList = new ArrayList<>();
 
-        try(Connection connection = this.getConnection();) {
+        try (Connection connection = this.getConnection();) {
             EmployeePayrollData emData = new EmployeePayrollData();
-            Statement statement =  connection.createStatement();
+            Statement statement = connection.createStatement();
             ResultSet result = statement.executeQuery(query);
             employeePayrollList = this.getEmployeePayrollData(result);
         } catch (SQLException e) {
@@ -168,42 +174,76 @@ public class EmployeePayrollDBService {
      * UC4 - object for preparedStatement
      */
     private void preparedStatementForEmployeeData() {
-       try {
-           Connection connection = this.getConnection();
-           String query = "SELECT * FROM employee_payroll where name = ?";
-           employeePayrollDataStatement = connection.prepareStatement(query);
-       } catch (EmployeePayrollException | SQLException e) {
-           e.printStackTrace();
-       }
+        try {
+            Connection connection = this.getConnection();
+            String query = "SELECT * FROM employee_payroll where name = ?";
+            employeePayrollDataStatement = connection.prepareStatement(query);
+        } catch (EmployeePayrollException | SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
      * UC3 - Method for updating the employee data using Statement
-     * @param name : employee name
+     *
+     * @param name   : employee name
      * @param salary : employee new salary
      * @return
      * @throws EmployeePayrollException
      * @throws SQLException
      */
     public int updateData(String name, double salary) throws EmployeePayrollException, SQLException {
-        return this.updateEmployeeDataUsingStatement(name,salary);
+        return this.updateEmployeeDataUsingStatement(name, salary);
     }
 
     /**
      * UC3 - Helper method for updating the employee data using Statement
-     * @param name : employee name
+     *
+     * @param name   : employee name
      * @param salary : employee new salary
      * @return
      * @throws EmployeePayrollException
      */
     private int updateEmployeeDataUsingStatement(String name, double salary) throws EmployeePayrollException {
-        String query = String.format("update employee_payroll set salary = %.2f where name = '%s';",salary,name);
-        try(Connection connection = this.getConnection()){
+        String query = String.format("update employee_payroll set salary = %.2f where name = '%s';", salary, name);
+        try (Connection connection = this.getConnection()) {
             Statement statement = connection.createStatement();
             return statement.executeUpdate(query);
-        }catch (SQLException e) {
+        } catch (SQLException e) {
             throw new EmployeePayrollException(e.getMessage());
         }
     }
 
+    /**
+     * UC7
+     *
+     * @param name
+     * @param salary
+     * @param startDate
+     * @param gender
+     * @return
+     */
+    public EmployeePayrollData addEmployeeToPayroll(String name, double salary, LocalDate startDate, String gender) throws EmployeePayrollException {
+        int employeeId = -1;
+        EmployeePayrollData employeePayrollData = new EmployeePayrollData();
+        String query = String.format("INSERT INTO employee_payroll (name,gender,salary,start_date)"
+                + "VALUES ('%s','%s','%s','%s')", name, gender, salary, Date.valueOf(startDate));
+        try (Connection connection = this.getConnection()) {
+            Statement statement = connection.createStatement();
+            int rowAffected = statement.executeUpdate(query, statement.RETURN_GENERATED_KEYS);
+            if (rowAffected == 1) {
+                ResultSet resultSet = statement.getGeneratedKeys();
+                if (resultSet.next()) employeeId = resultSet.getInt(1);
+            }
+            employeePayrollData.setId(employeeId);
+            employeePayrollData.setName(name);
+            employeePayrollData.setSalary(salary);
+            employeePayrollData.setGender(gender);
+            employeePayrollData.setStartDate(startDate);
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return employeePayrollData;
+    }
 }
